@@ -40,7 +40,7 @@ ________________________________ _______  .___   _____
 	for{
 		fmt.Println(art)
 		fmt.Println("Ingrese una opcion")
-		fmt.Println("1. Abrir mi vaul")
+		fmt.Println("1. Abrir mi Baul")
 		fmt.Println("1. Salir")
 
 		var option string
@@ -56,7 +56,6 @@ ________________________________ _______  .___   _____
 
 			fmt.Println("tratado de desencriptar")
 			crypt.Decrypt(filename, key)
-			return
 		case "0":
 			return
 			
