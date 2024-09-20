@@ -4,12 +4,19 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"fmt"
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 )
 
-func Encrypt(key string, plainText string, ouputFileName string){
+func Encrypt(key string, plainText string, ouputFileName string) {
+	dir := filepath.Dir(ouputFileName)
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		fmt.Printf("Directory %s exist skipping", dir)
+	}
 	strKey := key
 	byteSlice := []byte(strKey)
 	block := NewAesCipher(byteSlice)
@@ -56,4 +63,5 @@ func SaveCipherText(cipherText []byte, fileName string) {
 	if err != nil {
 		log.Fatalf("write file err: %v", err.Error())
 	}
+	fmt.Printf("saved to %s", fileName)
 }

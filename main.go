@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
+	"path"
 
 	"github.com/IrvinTM/gopass/crypt"
+	"github.com/IrvinTM/gopass/util"
 )
 
 type passwordDB struct {
@@ -16,16 +20,6 @@ type password struct {
 }
 
 func main() {
-
-	var key string
-	filename := "database"
-	// 	passwords := passwordDB{[]password{{Account: "facebook", Password: "123456"},{Account: "google", Password: "micontrasenadegoogle"}}}
-
-	// text, err := json.Marshal(passwords)
-	// if err != nil {
-	// 	log.Fatalf("error %v", err.Error())
-	// }
-
 	art := `
 
 ________________________________ _______  .___   _____   
@@ -36,31 +30,54 @@ ________________________________ _______  .___   _____
      \/            \/        \/         \/            \/ 
 
 	 `
+	var key string
+	homeDir := util.GetHomeDir()
+	filename := path.Join(homeDir+"/frenia", "database")
+	var db passwordDB
+	if util.CheckFileExists(filename) {
+		fmt.Println("Found database")
+	} else {
+		fmt.Println("DataBase not found creiting one...")
+		fmt.Println(filename)
+		fmt.Println("Please enter your key")
+		fmt.Scanln(&key)
+		passwords := passwordDB{[]password{{Account: "", Password: ""}}}
 
-	for{
-		fmt.Println(art)
-		fmt.Println("Ingrese una opcion")
-		fmt.Println("1. Abrir mi Baul")
-		fmt.Println("1. Salir")
+		text, err := json.Marshal(passwords)
+		if err != nil {
+			log.Fatalf("error %v", err.Error())
+		}
+		crypt.Encrypt(key, string(text), filename)
 
-		var option string
+		
+		for {
+			fmt.Println(art)
+			fmt.Println("Ingrese una opcion")
+			fmt.Println("1. Abrir mi Baul")
+			fmt.Println("0. Salir")
 
-		fmt.Scanln(&option)
+			var option string
 
-		switch option {
-		case "1":
-			fmt.Println("ingrese su key")
-			fmt.Scanln(&key)
+			fmt.Scanln(&option)
 
-			// crypt.Encrypt(key, string(text), filename)
+			switch option {
+			case "1":
+				fmt.Println("ingrese su key")
+				fmt.Scanln(&key)
 
-			fmt.Println("tratado de desencriptar")
-			crypt.Decrypt(filename, key)
-		case "0":
-			return
-			
+				fmt.Println("tratado de desencriptar")
+				decoded := crypt.Decrypt(filename, key)
+				err := json.Unmarshal(decoded, &db)
+				if err != nil {
+					log.Fatalf("there was an error err: %v", err.Error())
+				}
+				fmt.Printf("tus contrasenas son para %s es %v\n", db.Passwords[0].Account, db.Passwords[0].Password)
+			case "0":
+				return
+
+			}
+
 		}
 
 	}
-
 }

@@ -2,17 +2,16 @@ package crypt
 
 import (
 	"crypto/cipher"
-	"fmt"
 	"log"
 )
 
 
-func Decrypt(filename string, key string){
+func Decrypt(filename string, key string) []byte{
 	de := NewAesCipher([]byte(key))
 	AEAD := NewGcmStream(de)
 	encriptedBytes := ReadFile(filename)
 	decoded, _ := Decipher(encriptedBytes, filename, AEAD )
-	fmt.Printf("tus conrasenas son: %v", string(decoded))
+	return decoded
 }
 
 func Decipher(fileContent []byte, fileName string, gcm cipher.AEAD) ([]byte,error){
