@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 )
 
 func CheckFileExists(filePath string) bool {
@@ -19,4 +20,9 @@ func GetHomeDir() string{
 		return ""
 	}
 	return homeDir
+}
+
+func GetDbPath() string {
+	dbPath := path.Join(GetHomeDir()+"/frenia", "database")
+	return dbPath
 }
