@@ -4,14 +4,40 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
-	"github.com/IrvinTM/gopass/crypt"
-	"github.com/IrvinTM/gopass/handlers"
-	"github.com/IrvinTM/gopass/types"
-	"github.com/IrvinTM/gopass/util"
+	"github.com/IrvinTM/frenia/crypt"
+	"github.com/IrvinTM/frenia/model"
+	"github.com/IrvinTM/frenia/types"
+	"github.com/IrvinTM/frenia/util"
 )
 
-func Initial(){
+func Initial() {
+	
+	if len(os.Args) > 1 {
+		args := os.Args[1:]
+		switch args[1] {
+		case "add":
+
+		case "get":
+			if len(os.Args) > 2 {
+				var key string
+				fmt.Println("Enter your key")
+				fmt.Scanln(&key)
+				pass, err := model.Read(key,os.Args[2])
+				if err != nil {
+					fmt.Println(err)
+				}else{
+					fmt.Printf("Password: %s", pass)
+				}
+			}
+
+
+		default:
+			fmt.Println("Invalid arg")
+
+		}
+	}
 	art := `
 
 ________________________________ _______  .___   _____   
@@ -32,7 +58,7 @@ ________________________________ _______  .___   _____
 		fmt.Println(DbPath)
 		fmt.Println("Please enter your key")
 		fmt.Scanln(&key)
-		passwords := types.PasswordDB{[]types.Password{{Account: "", Password: ""}}}
+		passwords := types.PasswordDB{Passwords: map[string]string{"":""}}
 
 		text, err := json.Marshal(passwords)
 		if err != nil {
@@ -63,23 +89,23 @@ ________________________________ _______  .___   _____
 			if err != nil {
 				log.Fatalf("there was an error err: %v", err.Error())
 			}
-			for i, pass := range db.Passwords{
-				fmt.Println("Your passwords:")
-				fmt.Printf("%v %s",i+1, pass.Account)
+			fmt.Println("Your passwords:")
+			for account := range db.Passwords {
+				fmt.Printf("%s\n", account)
 			}
 		case "2":
-			var NewPassword types.Password
+			var account, password string
 			fmt.Println("Cuenta:")
-			_, err := fmt.Scanln(&NewPassword.Account)
+			_, err := fmt.Scanln(&account)
 			if err != nil {
 				fmt.Printf("Error scanning line %v", err.Error())
 			}
 			fmt.Println("Password:")
-			_, err = fmt.Scanln(&NewPassword.Password)
+			_, err = fmt.Scanln(&password)
 			if err != nil {
 				fmt.Printf("Error scanning line %v", err.Error())
 			}
-			handlers.AddPassword(key, NewPassword)
+			model.Save(key, account,password)
 		case "0":
 			return
 		default:
