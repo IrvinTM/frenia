@@ -57,7 +57,11 @@ func CheckConfigFile() {
 			fmt.Println(config.GlobalConfig)
 		}
 		fmt.Println(err)
-		// Else create and write the file
+		//TODO 2026-07-11T04:37:19.066Z
+		// Create the file
+		// Read mode from args
+		// Read/Save salt
+		// Test/Unlock db
 
 	}
 }
