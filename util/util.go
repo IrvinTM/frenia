@@ -1,11 +1,14 @@
 package util
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path"
+
+	"github.com/IrvinTM/frenia/config"
 )
 
 func CheckFileExists(filePath string) bool {
@@ -34,4 +37,27 @@ func GetHomeDir() string {
 func GetDbPath() string {
 	dbPath := path.Join(GetHomeDir()+"/frenia", "database")
 	return dbPath
+}
+
+func GetConfigPath() (string, error) {
+	configPath := path.Join(GetHomeDir()+"/.config", "frenia", "config.json")
+	if CheckFileExists(configPath) {
+		fmt.Printf("Config exists at: %s \n", configPath)
+		return configPath, nil
+	}
+	return "", errors.New("Config path was not found")
+}
+
+// this fuc will be used to read the config file and check if debug mode and so on
+func CheckConfigFile() {
+	if path, err := GetConfigPath(); err == nil {
+		fileContent := ReadFile(path)
+		if err := json.Unmarshal(fileContent, &config.GlobalConfig); err == nil {
+			fmt.Println("config file read success")
+			fmt.Println(config.GlobalConfig)
+		}
+		fmt.Println(err)
+		// Else create and write the file
+
+	}
 }

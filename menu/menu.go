@@ -13,7 +13,7 @@ import (
 )
 
 func Initial() {
-	
+
 	if len(os.Args) > 1 {
 		args := os.Args[1:]
 		switch args[1] {
@@ -24,14 +24,13 @@ func Initial() {
 				var key string
 				fmt.Println("Enter your key")
 				fmt.Scanln(&key)
-				pass, err := model.Read(key,os.Args[2])
+				pass, err := model.Read(key, os.Args[2])
 				if err != nil {
 					fmt.Println(err)
-				}else{
+				} else {
 					fmt.Printf("Password: %s", pass)
 				}
 			}
-
 
 		default:
 			fmt.Println("Invalid arg")
@@ -58,7 +57,7 @@ ________________________________ _______  .___   _____
 		fmt.Println(DbPath)
 		fmt.Println("Please enter your key")
 		fmt.Scanln(&key)
-		passwords := types.PasswordDB{Passwords: map[string]string{"":""}}
+		passwords := types.PasswordDB{Passwords: map[string]string{"": ""}}
 
 		text, err := json.Marshal(passwords)
 		if err != nil {
@@ -105,7 +104,7 @@ ________________________________ _______  .___   _____
 			if err != nil {
 				fmt.Printf("Error scanning line %v", err.Error())
 			}
-			model.Save(key, account,password)
+			model.Save(key, account, password)
 		case "0":
 			return
 		default:

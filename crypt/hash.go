@@ -38,4 +38,6 @@ func HashPassword(password string) (string, string, error) {
 
 // I need to save the salt
 
+//This will be done in a configuration file
+
 // hash the entered password
