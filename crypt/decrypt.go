@@ -3,20 +3,21 @@ package crypt
 import (
 	"crypto/cipher"
 	"log"
+
+	"github.com/IrvinTM/frenia/util"
 )
 
-
-func Decrypt(filename string, key string) []byte{
+func Decrypt(filename string, key string) []byte {
 	de := NewAesCipher([]byte(key))
 	AEAD := NewGcmStream(de)
-	encriptedBytes := ReadFile(filename)
-	decoded, _ := Decipher(encriptedBytes, filename, AEAD )
+	encriptedBytes := util.ReadFile(filename)
+	decoded, _ := Decipher(encriptedBytes, filename, AEAD)
 	return decoded
 }
 
-func Decipher(fileContent []byte, fileName string, gcm cipher.AEAD) ([]byte,error){
+func Decipher(fileContent []byte, fileName string, gcm cipher.AEAD) ([]byte, error) {
 	nonce := fileContent[:gcm.NonceSize()]
-	fileContent =fileContent[gcm.NonceSize():]
+	fileContent = fileContent[gcm.NonceSize():]
 	plainText, err := gcm.Open(nil, nonce, fileContent, nil)
 	if err != nil {
 		log.Fatalf("error decrypting err: %v", err.Error())

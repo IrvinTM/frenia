@@ -1,3 +1,8 @@
 module github.com/IrvinTM/frenia
 
-go 1.22.4
+go 1.25.0
+
+require (
+	golang.org/x/crypto v0.54.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+)

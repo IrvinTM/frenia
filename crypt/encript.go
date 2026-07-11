@@ -25,14 +25,6 @@ func Encrypt(key string, plainText string, ouputFileName string) {
 	SaveCipherText(encryptedText, ouputFileName)
 }
 
-func ReadFile(filename string) []byte {
-	plainText, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatalf("Error reading file err: %v", err.Error())
-	}
-	return plainText
-}
-
 func NewAesCipher(key []byte) cipher.Block {
 	block, err := aes.NewCipher(key)
 	if err != nil {
