@@ -1,9 +1,12 @@
 package main
 
-// import "github.com/IrvinTM/frenia/menu"
-import "github.com/IrvinTM/frenia/util"
+import (
+	// "github.com/IrvinTM/frenia/menu"
+
+)
 
 func main() {
+
 	// menu.Initial()
-	util.CheckConfigFile()
+
 }
