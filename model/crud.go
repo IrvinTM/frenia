@@ -18,6 +18,7 @@ func Save(key string, account string, password string ) {
 	if err != nil {
 		fmt.Printf("Error when getting passwords %v", err.Error())
 	}
+	// fmt.Printf("The database is %s", string(data) )
 	db.Passwords[account] = password
 
 	unmarshalled, err := json.Marshal(db)

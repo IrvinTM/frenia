@@ -62,7 +62,6 @@ func CheckConfigFile() bool {
 		fileContent := ReadFile(configPath)
 		if err := json.Unmarshal(fileContent, &config.GlobalConfig); err == nil {
 			fmt.Println("config file read success")
-			fmt.Println(config.GlobalConfig)
 		}
 		//TODO 2026-07-11T04:37:19.066Z
 		// Read mode from args

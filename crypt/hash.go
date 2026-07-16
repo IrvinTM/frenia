@@ -2,7 +2,6 @@ package crypt
 
 import (
 	"crypto/rand"
-	"encoding/base64"
 
 	//"fmt"
 	"golang.org/x/crypto/argon2"
@@ -23,10 +22,7 @@ func HashPassword(password string, salt []byte) (string, error) {
 	// Generate the Argon2id hash (derived key)
 	hash := argon2.IDKey([]byte(password), salt, timeCost, memoryCost, parallelism, keyLength)
 
-	// Encode the hash and salt in base64 for storage
-	encodedHash := base64.StdEncoding.EncodeToString(hash)
-
-	return encodedHash, nil
+	return string(hash), nil
 }
 
 // I need to save the salt

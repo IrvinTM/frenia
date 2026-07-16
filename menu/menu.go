@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"hash"
 	"log"
 	"os"
 
@@ -30,33 +29,45 @@ func Initial() {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "\n Error reading password:", err)
 		}
-		
-		hashed, err := crypt.HashPassword(string(bytepass), )
+
+		salt, err := base64.StdEncoding.DecodeString((config.GlobalConfig.Salt))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "\n Error decoding salt:", err)
+		}
+		hashed, err := crypt.HashPassword(string(bytepass), salt)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "\n Error hashing password:", err)
 		}
-	strPass := base64.StdEncoding.EncodeToString([]byte(hashed))
+	// strPass := base64.StdEncoding.EncodeToString([]byte(hashed))
+
+	strPass := hashed
 	pass = &strPass
+
 	}else{
 		salt := crypt.GenerateRamdomSalt(32)
 		configuration := types.Configuration{Salt: base64.StdEncoding.EncodeToString(salt)}
-		util.UpdateConfig(&configuration)}
+		util.UpdateConfig(&configuration)
+	}
 
 	if len(os.Args) > 1 {
+		fmt.Print("we got more than 1 arg")
 		args := os.Args[1:]
-		switch args[1] {
+		for i := range len(args){
+			fmt.Printf("\n arg %d : %s\n",i, args[i])
+		}
+		switch args[0] {
 		case "add":
 			if len(os.Args) > 3 {
-				model.Save(*pass, os.Args[2], os.Args[3])
+				model.Save(*pass, args[1], args[2])
 			}
 		case "get":
 			if len(os.Args) > 2 {
+				fmt.Printf("getting pass for %s\n", args[1])
 				readPass, err := model.Read(*pass, os.Args[2])
 				if err != nil {
 					fmt.Println(err)
-				} else {
-					fmt.Println(readPass)
 				}
+				fmt.Println(readPass)
 			}
 
 		default:
@@ -74,7 +85,6 @@ ________________________________ _______  .___   _____
      \/            \/        \/         \/            \/ 
 
 	 `
-	var key string
 	DbPath := util.GetDbPath()
 	var db types.PasswordDB
 	if util.CheckFileExists(DbPath) {
@@ -82,17 +92,19 @@ ________________________________ _______  .___   _____
 	} else {
 		fmt.Println("DataBase not found creiting one...")
 		fmt.Println(DbPath)
-		fmt.Println("Please enter your key")
-		fmt.Scanln(&key)
 		passwords := types.PasswordDB{Passwords: map[string]string{"": ""}}
 
 		text, err := json.Marshal(passwords)
 		if err != nil {
 			log.Fatalf("error %v", err.Error())
 		}
-		crypt.Encrypt(key, string(text), DbPath)
+
+		fmt.Printf("\n The key being uses is: %d  %s \n",len(*pass), *pass)
+
+		crypt.Encrypt(*pass, string(text), DbPath)
 
 	}
+	if len(os.Args) == 1 {
 	for {
 		fmt.Println(art)
 		fmt.Println("Ingrese una opcion")
@@ -106,11 +118,8 @@ ________________________________ _______  .___   _____
 
 		switch option {
 		case "1":
-			fmt.Println("ingrese su key")
-			fmt.Scanln(&key)
-
 			fmt.Println("tratado de desencriptar")
-			decoded := crypt.Decrypt(DbPath, key)
+			decoded := crypt.Decrypt(DbPath, *pass)
 			err := json.Unmarshal(decoded, &db)
 			if err != nil {
 				log.Fatalf("there was an error err: %v", err.Error())
@@ -131,7 +140,7 @@ ________________________________ _______  .___   _____
 			if err != nil {
 				fmt.Printf("Error scanning line %v", err.Error())
 			}
-			model.Save(key, account, password)
+			model.Save(*pass, account, password)
 		case "0":
 			return
 		default:
@@ -139,4 +148,7 @@ ________________________________ _______  .___   _____
 		}
 
 	}
+		
+	}
+	
 }
