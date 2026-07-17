@@ -1,3 +1,7 @@
+github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
+github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/tiagomelo/go-clipboard v0.1.2 h1:Ph2icR0vZRIj3v5ExvsGweBwsbbDUTlS6HoF40MkQD8=
+github.com/tiagomelo/go-clipboard v0.1.2/go.mod h1:kXtjJBIMimZaGbxmcKZ8+JqK+acSNf5tAJiChlZBOr8=
 golang.org/x/crypto v0.54.0 h1:YLIA59K4fiNzHzjnZt2tUJQjQtUWfWbeHBqKtk3eScw=
 golang.org/x/crypto v0.54.0/go.mod h1:KWL8ny2AZdGR2cWmzeHrp2azQPGogOv+HeQaVEXC2dk=
 golang.org/x/sys v0.47.0 h1:o7XGOvZQCADBQQ4Y7VNq2dRWQR7JmOUW8Kxx4ZsNgWs=

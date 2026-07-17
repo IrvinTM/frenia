@@ -12,6 +12,7 @@ import (
 	"github.com/IrvinTM/frenia/model"
 	"github.com/IrvinTM/frenia/types"
 	"github.com/IrvinTM/frenia/util"
+	"github.com/tiagomelo/go-clipboard/clipboard"
 	"golang.org/x/term"
 )
 
@@ -20,7 +21,9 @@ func Initial() {
 	//Load the config
 	configExists := util.CheckConfigFile()
 	var pass *string
-	
+
+	config.GlobalConfig.Mode = "debug"
+
 	if configExists {
 		fd := int(os.Stdin.Fd())
 		fmt.Println("Please enter your password")
@@ -38,36 +41,58 @@ func Initial() {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "\n Error hashing password:", err)
 		}
-	// strPass := base64.StdEncoding.EncodeToString([]byte(hashed))
+		// strPass := base64.StdEncoding.EncodeToString([]byte(hashed))
 
-	strPass := hashed
-	pass = &strPass
+		strPass := hashed
+		pass = &strPass
 
-	}else{
+	} else {
 		salt := crypt.GenerateRamdomSalt(32)
 		configuration := types.Configuration{Salt: base64.StdEncoding.EncodeToString(salt)}
 		util.UpdateConfig(&configuration)
 	}
 
 	if len(os.Args) > 1 {
-		fmt.Print("we got more than 1 arg")
+
 		args := os.Args[1:]
-		for i := range len(args){
-			fmt.Printf("\n arg %d : %s\n",i, args[i])
+		accName := args[1]
+
+		if config.GlobalConfig.Mode == "debug" {
+			fmt.Print("we got more than 1 arg")
+			for i := range len(args) {
+				fmt.Printf("\n arg %d : %s\n", i, args[i])
+			}
 		}
+
 		switch args[0] {
 		case "add":
-			if len(os.Args) > 3 {
-				model.Save(*pass, args[1], args[2])
+			if len(args) > 3 {
+				accPass := args[2]
+				if config.GlobalConfig.Mode == "debug" {
+					fmt.Println("Adding a password")
+				}
+				model.Save(*pass, accName, accPass)
+				fmt.Println("Password saved")
+				os.Exit(0)
 			}
+
 		case "get":
-			if len(os.Args) > 2 {
-				fmt.Printf("getting pass for %s\n", args[1])
-				readPass, err := model.Read(*pass, os.Args[2])
+			if len(args) > 1 {
+
+				if config.GlobalConfig.Mode == "debug" {
+
+					fmt.Printf("Getting pass for %s\n", accName)
+				}
+				readPass, err := model.Read(*pass, accName)
 				if err != nil {
 					fmt.Println(err)
 				}
-				fmt.Println(readPass)
+				c := clipboard.New()
+				if err := c.CopyText(readPass); err != nil {
+					fmt.Printf("There was an error copying the pass to clipboard %s \n", err)
+				}
+				fmt.Printf("\n %s pass copied to clipboard", accName)
+				//fmt.Println(readPass)
 			}
 
 		default:
@@ -99,56 +124,56 @@ ________________________________ _______  .___   _____
 			log.Fatalf("error %v", err.Error())
 		}
 
-		fmt.Printf("\n The key being uses is: %d  %s \n",len(*pass), *pass)
+		fmt.Printf("\n The key being uses is: %d  %s \n", len(*pass), *pass)
 
 		crypt.Encrypt(*pass, string(text), DbPath)
 
 	}
 	if len(os.Args) == 1 {
-	for {
-		fmt.Println(art)
-		fmt.Println("Ingrese una opcion")
-		fmt.Println("1. Abrir mi Baul")
-		fmt.Println("2. Agregar contrasena")
-		fmt.Println("0. Salir")
+		for {
+			fmt.Println(art)
+			fmt.Println("Ingrese una opcion")
+			fmt.Println("1. Abrir mi Baul")
+			fmt.Println("2. Agregar contrasena")
+			fmt.Println("0. Salir")
 
-		var option string
+			var option string
 
-		fmt.Scanln(&option)
+			fmt.Scanln(&option)
 
-		switch option {
-		case "1":
-			fmt.Println("tratado de desencriptar")
-			decoded := crypt.Decrypt(DbPath, *pass)
-			err := json.Unmarshal(decoded, &db)
-			if err != nil {
-				log.Fatalf("there was an error err: %v", err.Error())
+			switch option {
+			case "1":
+				fmt.Println("tratado de desencriptar")
+				decoded := crypt.Decrypt(DbPath, *pass)
+				err := json.Unmarshal(decoded, &db)
+				if err != nil {
+					log.Fatalf("there was an error err: %v", err.Error())
+				}
+				fmt.Println("Your passwords:")
+				for account := range db.Passwords {
+					fmt.Printf("%s\n", account)
+				}
+			case "2":
+				var account, password string
+				fmt.Println("Cuenta:")
+				_, err := fmt.Scanln(&account)
+				if err != nil {
+					fmt.Printf("Error scanning line %v", err.Error())
+				}
+				fmt.Println("Password:")
+				_, err = fmt.Scanln(&password)
+				if err != nil {
+					fmt.Printf("Error scanning line %v", err.Error())
+				}
+				model.Save(*pass, account, password)
+			case "0":
+				return
+			default:
+				fmt.Println("Invalid option")
 			}
-			fmt.Println("Your passwords:")
-			for account := range db.Passwords {
-				fmt.Printf("%s\n", account)
-			}
-		case "2":
-			var account, password string
-			fmt.Println("Cuenta:")
-			_, err := fmt.Scanln(&account)
-			if err != nil {
-				fmt.Printf("Error scanning line %v", err.Error())
-			}
-			fmt.Println("Password:")
-			_, err = fmt.Scanln(&password)
-			if err != nil {
-				fmt.Printf("Error scanning line %v", err.Error())
-			}
-			model.Save(*pass, account, password)
-		case "0":
-			return
-		default:
-			fmt.Println("Invalid option")
+
 		}
 
 	}
-		
-	}
-	
+
 }
