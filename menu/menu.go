@@ -66,11 +66,13 @@ func Initial() {
 
 		switch args[0] {
 		case "add":
-			if len(args) > 3 {
+				fmt.Println("case add...")
+			if len(args) > 2 {
 				accPass := args[2]
 				if config.GlobalConfig.Mode == "debug" {
 					fmt.Println("Adding a password")
 				}
+				fmt.Printf("adding password for %s", accPass)
 				model.Save(*pass, accName, accPass)
 				fmt.Println("Password saved")
 				os.Exit(0)
